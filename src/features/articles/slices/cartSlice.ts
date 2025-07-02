@@ -1,0 +1,200 @@
+import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
+
+interface CartItem {
+  articleId: string;
+  quantity: number;
+  price: number;
+  classId?: string[];
+  gift?: boolean;
+  useNow?: boolean;
+  otherId?: string;
+}
+
+interface CartState {
+  items: CartItem[];
+}
+
+const initialState: CartState = {
+  items:
+    typeof window !== "undefined" && localStorage.getItem("articles")
+      ? JSON.parse(localStorage.getItem("articles")!)
+      : [],
+};
+
+const cartSlice = createSlice({
+  name: "cart",
+  initialState,
+  reducers: {
+    addItem(state, action: PayloadAction<CartItem>) {
+      const { articleId, gift } = action.payload;
+
+      const existing = state.items.find(
+        (item) =>
+          item.articleId === articleId && item.gift === gift && !item.useNow,
+      );
+      if (existing) {
+        existing.quantity = action.payload.quantity;
+      } else {
+        state.items.push({ ...action.payload });
+      }
+
+      localStorage.setItem("articles", JSON.stringify(state.items));
+    },
+    removeItem(
+      state,
+      action: PayloadAction<{
+        articleId: string;
+        gift?: boolean;
+        useNow?: boolean;
+      }>,
+    ) {
+      const { articleId, gift } = action.payload;
+      state.items = state.items.filter(
+        (item) =>
+          !(
+            item.articleId === articleId &&
+            item.gift === gift &&
+            (item.useNow ?? false) === (action.payload.useNow ?? false)
+          ),
+      );
+
+      localStorage.setItem("articles", JSON.stringify(state.items));
+    },
+    addUseNow(state, action: PayloadAction<string>) {
+      const target = state.items.find(
+        (item) =>
+          item.articleId === action.payload &&
+          !item.gift &&
+          !item.useNow &&
+          !item.otherId,
+      );
+
+      const alreadyUsed = state.items.find((item) => item.useNow);
+
+      if (target && target.quantity === 1 && !alreadyUsed) {
+        target.useNow = true;
+      }
+
+      if (target && target.quantity > 1 && !alreadyUsed) {
+        target.quantity -= 1;
+
+        state.items.push({
+          articleId: action.payload,
+          quantity: 1,
+          price: target.price,
+          useNow: true,
+        });
+      }
+
+      localStorage.setItem("articles", JSON.stringify(state.items));
+    },
+    removeUseNow(
+      state,
+      action: PayloadAction<{ articleId: string; price: number }>,
+    ) {
+      const { articleId, price } = action.payload;
+      const target = state.items.find(
+        (item) =>
+          item.articleId === articleId &&
+          !item.gift &&
+          !item.useNow &&
+          !item.otherId,
+      );
+
+      if (target) {
+        target.quantity += 1;
+      } else {
+        state.items.push({
+          articleId,
+          price,
+          quantity: 1,
+        });
+      }
+
+      state.items = state.items.filter((item) => !item.useNow);
+
+      localStorage.setItem("articles", JSON.stringify(state.items));
+    },
+    assignOtherId(
+      state,
+      action: PayloadAction<{
+        articleId: string;
+        otherId: string;
+      }>,
+    ) {
+      const { articleId, otherId } = action.payload;
+
+      const target = state.items.find(
+        (item) =>
+          item.articleId === articleId &&
+          !item.useNow &&
+          !item.gift &&
+          !item.otherId,
+      );
+
+      if (target) {
+        if (target.quantity > 1) {
+          target.quantity -= 1;
+
+          state.items.push({
+            articleId,
+            quantity: 1,
+            price: target.price,
+            otherId,
+          });
+        } else {
+          target.otherId = otherId;
+        }
+
+        localStorage.setItem("articles", JSON.stringify(state.items));
+      }
+    },
+    removeOtherId(
+      state,
+      action: PayloadAction<{
+        articleId: string;
+        otherId: string;
+        price: number;
+      }>,
+    ) {
+      const { articleId, otherId, price } = action.payload;
+      const target = state.items.find(
+        (item) =>
+          item.articleId === articleId &&
+          !item.gift &&
+          !item.useNow &&
+          !item.otherId,
+      );
+
+      if (target) {
+        target.quantity += 1;
+      } else {
+        state.items.push({
+          articleId,
+          quantity: 1,
+          price,
+        });
+      }
+
+      state.items = state.items.filter((item) => item.otherId !== otherId);
+      localStorage.setItem("articles", JSON.stringify(state.items));
+    },
+    clearCart(state) {
+      state.items = [];
+      localStorage.removeItem("articles");
+    },
+  },
+});
+
+export const {
+  addItem,
+  removeItem,
+  clearCart,
+  addUseNow,
+  removeUseNow,
+  assignOtherId,
+  removeOtherId,
+} = cartSlice.actions;
+export default cartSlice.reducer;
+
+export const getCart = (state: { cart: CartState }) => state.cart;
