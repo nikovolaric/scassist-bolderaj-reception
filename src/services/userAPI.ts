@@ -24,11 +24,17 @@ export async function getMe() {
 export async function getAllUsers(
   page: number,
   limit: number,
-  lastName: string,
+  lastName?: string,
 ) {
   try {
+    const params = new URLSearchParams();
+
+    params.append("page", page.toString());
+    params.append("limit", limit.toString());
+    if (lastName) params.append("lastName", lastName.toString());
+
     const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/users?page=${page}&limit=${limit}${lastName ? `&lastName=${lastName}` : ""}`,
+      `${import.meta.env.VITE_API_URL}/users?${params.toString()}`,
       {
         method: "GET",
         credentials: "include",

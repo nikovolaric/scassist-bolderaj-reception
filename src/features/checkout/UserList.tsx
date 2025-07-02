@@ -1,15 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { getAllUsers } from "../../services/userAPI";
-import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  MagnifyingGlassIcon,
+} from "@heroicons/react/24/outline";
 import Spinner from "../../components/Spinner";
 import UserListCard from "./UserListCard";
 
 function UserList() {
   const [lastName, setLastName] = useState("");
-  const { data, isLoading } = useQuery({
+  const [page, setPage] = useState(1);
+  const { data, isPending } = useQuery({
     queryKey: ["users", lastName],
-    queryFn: () => getAllUsers(lastName),
+    queryFn: () => getAllUsers(page, 30, lastName),
   });
 
   return (
@@ -24,7 +29,7 @@ function UserList() {
       </div>
       <div>
         <NameBar />
-        {isLoading ? (
+        {isPending ? (
           <Spinner />
         ) : (
           <>
@@ -42,6 +47,28 @@ function UserList() {
               ),
             )}
           </>
+        )}
+      </div>
+      <div className="flex items-center justify-between">
+        {page === 1 ? (
+          <div />
+        ) : (
+          <button
+            className="flex cursor-pointer items-center gap-4 rounded-xl border border-black px-4 py-2 font-semibold"
+            onClick={() => setPage((page) => page - 1)}
+          >
+            <ChevronLeftIcon className="h-4 stroke-3" /> Prejšna stran
+          </button>
+        )}
+        {!isPending && data.results === 30 ? (
+          <button
+            className="from-primary to-secondary drop-shadow-btn hover:to-primary flex cursor-pointer items-center gap-4 rounded-lg bg-gradient-to-r px-4 py-2 font-semibold transition-colors duration-300 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400"
+            onClick={() => setPage((page) => page + 1)}
+          >
+            Naslednja stran <ChevronRightIcon className="h-4 stroke-3" />
+          </button>
+        ) : (
+          <div />
         )}
       </div>
     </div>
