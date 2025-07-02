@@ -22,7 +22,7 @@ export async function getArticles(
 
     if (!res.ok) {
       const data = await res.json();
-      if (data.error.statusCode === 500) {
+      if (data.status === "error") {
         throw new Error(
           "Nekaj je šlo narobe na strežniku! Poiskusite kasneje!",
         );
@@ -48,7 +48,7 @@ export async function getOneArticle(id: string) {
     if (!res.ok) {
       const data = await res.json();
       console.log(data);
-      if (data.error.statusCode === 500) {
+      if (data.status === "error") {
         throw new Error(
           "Nekaj je šlo narobe na strežniku! Poiskusite kasneje!",
         );
@@ -82,7 +82,7 @@ export async function sellArticles(id: string, bodyData: unknown) {
     if (!res.ok) {
       const data = await res.json();
       console.log(data);
-      if (data.error.statusCode === 500) {
+      if (data.status === "error") {
         throw new Error(
           "Nekaj je šlo narobe na strežniku! Poiskusite kasneje!",
         );
