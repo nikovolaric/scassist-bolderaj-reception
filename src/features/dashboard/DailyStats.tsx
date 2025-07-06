@@ -17,7 +17,7 @@ function DailyStats() {
     queryFn: getDailyVisits,
   });
 
-  if (isPending) {
+  if (isPending || !data) {
     return <Spinner />;
   }
 
@@ -25,13 +25,20 @@ function DailyStats() {
     <div className="flex h-101 flex-col gap-16 rounded-xl bg-white px-6 pt-14 pb-7">
       <div className="flex items-center justify-between">
         <p className="font-quicksand text-xl font-bold">OBISK CENTRA</p>
-        <p className="uppercase">
+        <p className="flex items-center gap-4 uppercase">
           {new Date().toLocaleDateString("sl-SI", {
             weekday: "long",
             day: "2-digit",
             month: "2-digit",
             year: "numeric",
           })}
+          <span className="font-semibold">
+            Skupaj št. obiskov:{" "}
+            {data.groupedVisits.reduce(
+              (c: number, a: { visitCount: number }) => a.visitCount + c,
+              0,
+            )}{" "}
+          </span>
         </p>
       </div>
       <div className="h-full">

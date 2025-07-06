@@ -7,8 +7,18 @@ export async function getAllGifts(
   expired: boolean,
 ) {
   try {
+    const params = new URLSearchParams();
+    params.append("giftCode", giftCode);
+    params.append("label", label);
+    params.append("limit", limit.toString());
+    params.append("page", page.toString());
+    params.append("used", used.toString());
+    if (expired) {
+      params.append("expired", expired.toString());
+    }
+
     const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/gifts?giftCode=${giftCode}&label=${label}&page=${page}&limit=${limit}&used=${used}${expired ? `&expired=true` : ""}`,
+      `${import.meta.env.VITE_API_URL}/gifts?${params.toString()}`,
       {
         method: "GET",
         credentials: "include",
@@ -69,16 +79,14 @@ export async function confirmGift(id: string, userId: string) {
       },
     );
 
+    const data = await res.json();
+
     if (!res.ok) {
-      const data = await res.json();
-      console.log(data);
       if (data.status === "error") {
         throw new Error("Napaka na strežniku! Prosim poskusite kasneje.");
       }
       throw Error(data.message);
     }
-
-    const data = await res.json();
 
     return data;
   } catch (error) {

@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router";
 import { getUserVisits } from "../../services/visitsAPI";
+import Spinner from "../../components/Spinner";
 
 function Visits() {
   const { id } = useParams();
@@ -9,6 +10,10 @@ function Visits() {
     queryFn: () => getUserVisits(id!),
     enabled: !!id,
   });
+
+  if (isPending || !data) {
+    return <Spinner />;
+  }
 
   return (
     <div className="col-span-2 flex h-full flex-col gap-1.5">

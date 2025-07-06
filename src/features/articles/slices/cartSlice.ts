@@ -60,16 +60,24 @@ const cartSlice = createSlice({
 
       localStorage.setItem("articles", JSON.stringify(state.items));
     },
-    addUseNow(state, action: PayloadAction<string>) {
+    addUseNow(
+      state,
+      action: PayloadAction<{ articleId: string; otherId?: string }>,
+    ) {
+      const { articleId, otherId } = action.payload;
+
       const target = state.items.find(
         (item) =>
-          item.articleId === action.payload &&
+          item.articleId === articleId &&
           !item.gift &&
           !item.useNow &&
-          !item.otherId,
+          (otherId ? item.otherId === otherId : !item.otherId),
       );
 
-      const alreadyUsed = state.items.find((item) => item.useNow);
+      const alreadyUsed = state.items.find(
+        (item) =>
+          item.useNow && (otherId ? item.otherId === otherId : !item.otherId),
+      );
 
       if (target && target.quantity === 1 && !alreadyUsed) {
         target.useNow = true;
@@ -79,9 +87,10 @@ const cartSlice = createSlice({
         target.quantity -= 1;
 
         state.items.push({
-          articleId: action.payload,
+          articleId,
           quantity: 1,
           price: target.price,
+          otherId,
           useNow: true,
         });
       }
@@ -90,15 +99,21 @@ const cartSlice = createSlice({
     },
     removeUseNow(
       state,
-      action: PayloadAction<{ articleId: string; price: number }>,
+      action: PayloadAction<{
+        articleId: string;
+        price: number;
+        otherId?: string;
+      }>,
     ) {
-      const { articleId, price } = action.payload;
+      const { articleId, price, otherId } = action.payload;
+
+      // Poiščemo ciljnega elementa, ki ni useNow in ima ustrezne lastnosti
       const target = state.items.find(
         (item) =>
           item.articleId === articleId &&
           !item.gift &&
           !item.useNow &&
-          !item.otherId,
+          (otherId ? item.otherId === otherId : !item.otherId),
       );
 
       if (target) {
@@ -107,11 +122,18 @@ const cartSlice = createSlice({
         state.items.push({
           articleId,
           price,
+          otherId,
           quantity: 1,
         });
       }
 
-      state.items = state.items.filter((item) => !item.useNow);
+      // Odstranimo samo elemente z useNow: true in ustreznim otherId
+      state.items = state.items.filter(
+        (item) =>
+          !(
+            item.useNow && (otherId ? item.otherId === otherId : !item.otherId)
+          ),
+      );
 
       localStorage.setItem("articles", JSON.stringify(state.items));
     },

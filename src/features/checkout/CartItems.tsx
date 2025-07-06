@@ -1,4 +1,4 @@
-import { useQueries, useQueryClient } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 import { useAppDispatch, useAppSelector } from "../../app/hooks";
 import {
   addUseNow,
@@ -7,7 +7,7 @@ import {
   removeUseNow,
 } from "../articles/slices/cartSlice";
 import { getOneArticle } from "../../services/articlesAPI";
-import { Link, useLocation, useParams } from "react-router";
+import { Link, useLocation } from "react-router";
 import { getOneUser } from "../../services/userAPI";
 
 function CartItems() {
@@ -45,22 +45,17 @@ function CartItemCard({
     otherId?: string;
   };
 }) {
-  const { id } = useParams();
-  const queryClient = useQueryClient();
   const { articleId, quantity, gift, useNow, otherId } = cartItem;
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
 
-  const user = queryClient.getQueryData<{ data: { ageGroup: string } }>([
-    "user",
-    id,
-  ]);
-  const [{ data, isPending }, { data: userData, isPending: pendingUser }] =
+  const [{ data, isPending }, { data: userData, isPending: pendingOtherUser }] =
     useQueries({
       queries: [
         {
           queryKey: [articleId],
           queryFn: () => getOneArticle(articleId),
+          enabled: !!articleId,
         },
         {
           queryKey: ["otherUser", otherId],
@@ -72,14 +67,14 @@ function CartItemCard({
 
   function handleChange() {
     if (!cartItem.useNow) {
-      dispatch(addUseNow(articleId));
+      dispatch(addUseNow({ articleId, otherId }));
     } else {
       const price =
         data.article.label === "VV"
           ? data.article.classPriceData.priceDDV
           : data.article.priceDDV;
 
-      dispatch(removeUseNow({ articleId, price }));
+      dispatch(removeUseNow({ articleId, price, otherId }));
     }
   }
 
@@ -93,7 +88,7 @@ function CartItemCard({
     }
   }
 
-  if (isPending) {
+  if (isPending || !data) {
     return <span>...</span>;
   }
 
@@ -128,28 +123,26 @@ function CartItemCard({
           {data.article.label === "V" && !gift && (
             <div className="flex h-full flex-col items-start justify-between">
               <div className="flex items-center gap-3">
-                {!otherId && (
-                  <>
-                    <label className="cursor-pointer">
-                      <input
-                        type="checkbox"
-                        className="peer hidden"
-                        defaultChecked={useNow}
-                        onChange={handleChange}
+                <>
+                  <label className="cursor-pointer">
+                    <input
+                      type="checkbox"
+                      className="peer hidden"
+                      defaultChecked={useNow}
+                      onChange={handleChange}
+                    />
+                    <div className="border-gray flex h-6 w-6 items-center justify-center rounded-lg border bg-white transition-all duration-75">
+                      <span
+                        className={` ${useNow ? "bg-primary border-gray border" : ""} h-4 w-4 rounded-full`}
                       />
-                      <div className="border-gray flex h-6 w-6 items-center justify-center rounded-lg border bg-white transition-all duration-75">
-                        <span
-                          className={` ${useNow ? "bg-primary border-gray border" : ""} h-4 w-4 rounded-full`}
-                        />
-                      </div>
-                    </label>
-                    <p className="font-medium">Vnovči zdaj</p>
-                  </>
-                )}
+                    </div>
+                  </label>
+                  <p className="font-medium">Vnovči zdaj</p>
+                </>
               </div>
               {otherId && (
                 <div className="flex items-center gap-3">
-                  {user && user.data.ageGroup === userData.data.ageGroup && (
+                  {userData && (
                     <label className="cursor-pointer">
                       <input
                         type="checkbox"
@@ -165,7 +158,7 @@ function CartItemCard({
                     </label>
                   )}
                   <div>
-                    {pendingUser ? (
+                    {pendingOtherUser ? (
                       "..."
                     ) : (
                       <>
