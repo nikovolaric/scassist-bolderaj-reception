@@ -49,6 +49,7 @@ function InvoicesList() {
                   buyer: { firstName: string; lastName: string };
                   paymentMethod: string;
                   _id: string;
+                  totalAmount: number;
                 },
                 i: number,
               ) => (
@@ -88,10 +89,12 @@ function InvoiceListCard({
     buyer: { firstName: string; lastName: string };
     paymentMethod: string;
     _id: string;
+    totalAmount: number;
   };
   i: number;
 }) {
-  const { invoiceData, invoiceDate, buyer, paymentMethod, _id } = invoice;
+  const { invoiceData, invoiceDate, buyer, paymentMethod, _id, totalAmount } =
+    invoice;
   const [isLoadingOpen, setIsLoadingOpen] = useState(false);
   const [isOpenConfirm, setIsOpenConfirm] = useState(false);
 
@@ -133,7 +136,7 @@ function InvoiceListCard({
         >
           {isLoadingOpen ? "..." : "Odpri PDF"}
         </button>
-        {i === 0 ? (
+        {i === 0 && totalAmount > 0 ? (
           <button
             className="from-primary to-secondary drop-shadow-btn hover:to-primary cursor-pointer rounded-lg bg-gradient-to-r px-4 py-3 font-semibold transition-colors duration-300"
             onClick={() => setIsOpenConfirm(true)}
