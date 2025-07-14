@@ -3,9 +3,13 @@ import {
   ChevronRightIcon,
   MagnifyingGlassIcon,
 } from "@heroicons/react/24/outline";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type Dispatch, type SetStateAction } from "react";
-import { getMyIssuedInvoices, openInvoice } from "../../services/invoicesAPI";
+import {
+  getMyIssuedInvoices,
+  openInvoice,
+  stornoInvoice,
+} from "../../services/invoicesAPI";
 import Spinner from "../../components/Spinner";
 
 function InvoicesList() {
@@ -117,7 +121,7 @@ function InvoiceListCard({
           minute: "2-digit",
         })}
       </p>
-      <p className="text-black/50">{`${buyer.firstName} ${buyer.lastName}`}</p>
+      <p className="text-black/50">{`${buyer?.firstName ?? ""} ${buyer?.lastName ?? ""}`}</p>
       <p className="text-black/50">
         {paymentMethod === "gotovina" ? "Gotovina" : "Kartica"}
       </p>
@@ -143,6 +147,7 @@ function InvoiceListCard({
           <ConfirmStornoInvoice
             setIsOpenConfirm={setIsOpenConfirm}
             invoiceNo={`${invoiceData.businessPremises}-${invoiceData.deviceNo}-${invoiceData.invoiceNo}-${invoiceData.year}`}
+            id={_id}
           />
         )}
       </div>
@@ -153,32 +158,30 @@ function InvoiceListCard({
 function ConfirmStornoInvoice({
   invoiceNo,
   setIsOpenConfirm,
-  //   setIsSuccess,
+  id,
 }: {
   invoiceNo: string;
   setIsOpenConfirm: Dispatch<SetStateAction<boolean>>;
-  //   setIsSuccess?: Dispatch<SetStateAction<boolean>>;
+  id: string;
 }) {
-  //   const queryClient = useQueryClient();
-  //   const { id } = useParams();
-  //   const [isLoading, setIsLoading] = useState(false);
+  const queryClient = useQueryClient();
+  const [isLoading, setIsLoading] = useState(false);
 
-  //   async function handleUseTicket() {
-  //     try {
-  //       setIsLoading(true);
+  async function stornoLastInvoice() {
+    try {
+      setIsLoading(true);
 
-  //       //   await companyTicketsUse(id!, usersId);
+      await stornoInvoice(id);
 
-  //       if (setIsSuccess) setIsSuccess(true);
+      setIsOpenConfirm(false);
 
-  //       setIsOpenConfirm(false);
-  //       //   queryClient.invalidateQueries({ queryKey: ["company", id] });
-  //     } catch (error) {
-  //       console.log(error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   }
+      queryClient.invalidateQueries({ queryKey: ["issuedInvoices"] });
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div
@@ -196,10 +199,9 @@ function ConfirmStornoInvoice({
           <ChevronLeftIcon className="h-4 stroke-3" /> Prekliči
         </button>
         <button
-          //   onClick={handleUseTicket}
-          onClick={() => setIsOpenConfirm(false)}
+          onClick={stornoLastInvoice}
           className="from-primary to-secondary drop-shadow-btn hover:to-primary flex cursor-pointer items-center gap-4 rounded-lg bg-gradient-to-r px-4 py-3 font-semibold transition-colors duration-300 disabled:cursor-not-allowed disabled:from-gray-400 disabled:to-gray-400"
-          //   disabled={isLoading}
+          disabled={isLoading}
         >
           Storniraj račun <ChevronRightIcon className="h-4 stroke-3" />
         </button>

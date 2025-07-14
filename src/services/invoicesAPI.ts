@@ -49,3 +49,27 @@ export async function openInvoice(id: string) {
     return error as Error;
   }
 }
+
+export async function stornoInvoice(id: string) {
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/invoices/stornoreception/${id}`,
+      {
+        method: "POST",
+        credentials: "include",
+      },
+    );
+    const data = await res.json();
+
+    if (!res.ok) {
+      if (data.status === "error") {
+        throw new Error("Napaka na strežniku! Prosim poskusite kasneje.");
+      }
+      throw Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    return error as Error;
+  }
+}
