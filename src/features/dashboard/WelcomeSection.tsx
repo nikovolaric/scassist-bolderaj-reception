@@ -8,7 +8,6 @@ import {
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import Spinner from "../../components/Spinner";
 import LinkBtn from "../../components/LinkBtn";
-import { logout } from "../../services/authAPI";
 import { useNavigate } from "react-router";
 
 const links = [
@@ -64,8 +63,6 @@ function WelcomeSection() {
       setIsLoading(true);
 
       await endCashRegisterRecord(endCahsBalance, endCardBalance);
-
-      await logout();
 
       navigate("/");
     } catch (error) {
