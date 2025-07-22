@@ -26,17 +26,40 @@ const cartSlice = createSlice({
   initialState,
   reducers: {
     addItem(state, action: PayloadAction<CartItem>) {
-      const { articleId, gift } = action.payload;
+      const { articleId, gift, otherId, quantity } = action.payload;
+
+      const existingUsed = state.items.find(
+        (item) =>
+          item.articleId === articleId &&
+          item.gift === gift &&
+          item.otherId === otherId &&
+          item.useNow,
+      );
 
       const existing = state.items.find(
         (item) =>
-          item.articleId === articleId && item.gift === gift && !item.useNow,
+          item.articleId === articleId &&
+          item.gift === gift &&
+          item.otherId === otherId &&
+          !item.useNow,
       );
-      if (existing) {
-        existing.quantity = action.payload.quantity;
-      } else {
-        state.items.push({ ...action.payload });
+
+      if (!existingUsed && !existing && quantity === 1) {
+        state.items.push({ ...action.payload, useNow: true });
       }
+      if (!existingUsed && !existing && quantity > 1) {
+        state.items.push(
+          { ...action.payload, useNow: true, quantity: 1 },
+          { ...action.payload, quantity: quantity - 1 },
+        );
+      }
+      if (existing && existingUsed) {
+        existing.quantity = action.payload.quantity;
+      }
+
+      // else {
+      //   state.items.push({ ...action.payload, useNow: true });
+      // }
 
       localStorage.setItem("articles", JSON.stringify(state.items));
     },
