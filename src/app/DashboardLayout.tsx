@@ -1,18 +1,28 @@
 import { Suspense, useEffect } from "react";
 import Spinner from "../components/Spinner";
-import { Navigate, Outlet, useLocation } from "react-router";
-import { useQuery } from "@tanstack/react-query";
+import { Navigate, Outlet, useLocation, useNavigate } from "react-router";
+import { useQueries } from "@tanstack/react-query";
 import { getMe } from "../services/userAPI";
 import { useAppDispatch } from "./hooks";
 import { clearCart } from "../features/articles/slices/cartSlice";
+import { getCRR } from "../services/cashregisterAPI";
 
 function DashboardLayout() {
+  const navigate = useNavigate();
   const { pathname } = useLocation();
   const dispatch = useAppDispatch();
 
-  const { data, isPending } = useQuery({
-    queryKey: ["me"],
-    queryFn: getMe,
+  const [{ data, isPending }, { data: cashRegisterData }] = useQueries({
+    queries: [
+      {
+        queryKey: ["me"],
+        queryFn: getMe,
+      },
+      {
+        queryKey: ["CRR"],
+        queryFn: getCRR,
+      },
+    ],
   });
 
   useEffect(
@@ -23,8 +33,12 @@ function DashboardLayout() {
       ) {
         dispatch(clearCart());
       }
+
+      if (cashRegisterData instanceof Error && pathname !== "/dashboard") {
+        navigate("/dashboard");
+      }
     },
-    [pathname],
+    [pathname, cashRegisterData],
   );
 
   if (isPending) {
