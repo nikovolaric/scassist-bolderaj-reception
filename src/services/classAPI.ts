@@ -4,8 +4,16 @@ export async function getMultipleDateClasses(
   article?: string,
 ) {
   try {
+    const params = new URLSearchParams();
+
+    params.append("ageGroup", ageGroup);
+    params.append("hiddenReception", "false");
+
+    if (name) params.append("className", name);
+    if (article) params.append("article", article);
+
     const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/classes/multipledates?ageGroup=${ageGroup}${name ? `&className=${name}` : ""}${article ? `&article=${article}` : ""}`,
+      `${import.meta.env.VITE_API_URL}/classes/multipledates?${params.toString()}`,
       {
         method: "GET",
         credentials: "include",
@@ -32,8 +40,15 @@ export async function getMultipleDateClasses(
 
 export async function getSingleDateClasses(ageGroup: string, article?: string) {
   try {
+    const params = new URLSearchParams();
+
+    params.append("ageGroup", ageGroup);
+    params.append("hiddenReception", "false");
+
+    if (article) params.append("article", article);
+
     const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/classes/singledatesreception?ageGroup=${ageGroup}${article ? `&article=${article}` : ""}`,
+      `${import.meta.env.VITE_API_URL}/classes/singledatesreception?${params.toString()}`,
       {
         method: "GET",
         credentials: "include",
@@ -67,6 +82,7 @@ export async function getSingleDateClassesFuture(
     const params = new URLSearchParams();
 
     params.append("ageGroup", ageGroup);
+    params.append("hiddenReception", "false");
 
     if (article) params.append("article", article);
 
