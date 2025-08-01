@@ -64,17 +64,22 @@ export async function getSingleDateClassesFuture(
   article?: string,
 ) {
   try {
+    const params = new URLSearchParams();
+
+    params.append("ageGroup", ageGroup);
+
+    if (article) params.append("article", article);
+
     const res = await fetch(
-      `${import.meta.env.VITE_API_URL}/classes/singledates?ageGroup=${ageGroup}${article ? `&article=${article}` : ""}`,
+      `${import.meta.env.VITE_API_URL}/classes/singledates?${params.toString()}`,
       {
         method: "GET",
         credentials: "include",
       },
     );
+    const data = await res.json();
 
     if (!res.ok) {
-      const data = await res.json();
-      console.log(data);
       if (data.status === "error") {
         throw new Error(
           "Nekaj je šlo narobe na strežniku! Poiskusite kasneje!",
@@ -82,8 +87,6 @@ export async function getSingleDateClassesFuture(
       }
       throw Error(data.message);
     }
-
-    const data = await res.json();
 
     return data;
   } catch (error) {
