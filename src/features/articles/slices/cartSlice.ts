@@ -177,6 +177,8 @@ const cartSlice = createSlice({
           !item.otherId,
       );
 
+      console.log(target?.quantity);
+
       if (target) {
         if (target.quantity > 1) {
           target.quantity -= 1;
@@ -189,6 +191,7 @@ const cartSlice = createSlice({
           });
         } else {
           target.otherId = otherId;
+          target.useNow = true;
         }
 
         localStorage.setItem("articles", JSON.stringify(state.items));

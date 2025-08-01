@@ -69,6 +69,8 @@ function CheckBox({
   );
 
   function handleChange() {
+    if (new Date(date) > new Date()) return;
+
     setIsChecked((isChecked) => !isChecked);
 
     if (!curStudent?.dates.includes(date)) {
@@ -79,7 +81,9 @@ function CheckBox({
   }
 
   return (
-    <label className="cursor-pointer">
+    <label
+      className={`${new Date(date) > new Date() ? "cursor-not-allowed" : ""}`}
+    >
       <input
         type="checkbox"
         className="peer hidden"
