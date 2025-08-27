@@ -73,3 +73,38 @@ export async function stornoInvoice(id: string) {
     return error as Error;
   }
 }
+
+export async function updatePaymentMethod({
+  id,
+  paymentMethod,
+}: {
+  id: string;
+  paymentMethod: string;
+}) {
+  try {
+    const res = await fetch(
+      `${import.meta.env.VITE_API_URL}/invoices/updatepaymentmethod/${id}`,
+      {
+        method: "PATCH",
+        credentials: "include",
+        headers: {
+          "Content-Type": "application/json",
+          accept: "application/json",
+        },
+        body: JSON.stringify({ paymentMethod }),
+      },
+    );
+    const data = await res.json();
+
+    if (!res.ok) {
+      if (data.status === "error") {
+        throw new Error("Napaka na strežniku! Prosim poskusite kasneje.");
+      }
+      throw Error(data.message);
+    }
+
+    return data;
+  } catch (error) {
+    return error as Error;
+  }
+}

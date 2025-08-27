@@ -2,6 +2,7 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   MagnifyingGlassIcon,
+  PencilIcon,
 } from "@heroicons/react/24/outline";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState, type Dispatch, type SetStateAction } from "react";
@@ -9,8 +10,10 @@ import {
   getMyIssuedInvoices,
   openInvoice,
   stornoInvoice,
+  updatePaymentMethod,
 } from "../../services/invoicesAPI";
 import Spinner from "../../components/Spinner";
+import { SaveIcon } from "lucide-react";
 
 function InvoicesList() {
   const [buyerName, setBuyerName] = useState("");
@@ -95,8 +98,11 @@ function InvoiceListCard({
 }) {
   const { invoiceData, invoiceDate, buyer, paymentMethod, _id, totalAmount } =
     invoice;
+  const queryClient = useQueryClient();
+
   const [isLoadingOpen, setIsLoadingOpen] = useState(false);
   const [isOpenConfirm, setIsOpenConfirm] = useState(false);
+  const [editPayment, setEditPayment] = useState(false);
 
   async function openInvoiceClick() {
     try {
@@ -107,6 +113,19 @@ function InvoiceListCard({
       console.log(error);
     } finally {
       setIsLoadingOpen(false);
+    }
+  }
+
+  async function changePayment(formData: FormData) {
+    try {
+      const paymentMethod = formData.get("paymentMethod") as string;
+
+      await updatePaymentMethod({ paymentMethod, id: _id });
+
+      queryClient.invalidateQueries({ queryKey: ["issuedInvoices"] });
+      setEditPayment(false);
+    } catch (error) {
+      console.error(error);
     }
   }
 
@@ -125,9 +144,36 @@ function InvoiceListCard({
         })}
       </p>
       <p className="text-black/50">{`${buyer?.firstName ?? ""} ${buyer?.lastName ?? ""}`}</p>
-      <p className="text-black/50">
-        {paymentMethod === "gotovina" ? "Gotovina" : "Kartica"}
-      </p>
+      {i === 0 ? (
+        editPayment ? (
+          <form className="flex items-center gap-2" action={changePayment}>
+            <select
+              className="w-3/4 cursor-pointer rounded-lg border border-gray-300 px-2 py-1 shadow-xs"
+              name="paymentMethod"
+              defaultValue={paymentMethod}
+            >
+              <option value="">Izberi način plačila</option>
+              <option value="gotovina">Gotovina</option>
+              <option value="card">Kartica</option>
+            </select>
+            <button>
+              <SaveIcon height={16} className="cursor-pointer text-black/50" />
+            </button>
+          </form>
+        ) : (
+          <p className="flex items-center gap-2 text-black/50">
+            {paymentMethod === "gotovina" ? "Gotovina" : "Kartica"}{" "}
+            <PencilIcon
+              className="h-4 cursor-pointer text-black/50"
+              onClick={() => setEditPayment(true)}
+            />
+          </p>
+        )
+      ) : (
+        <p className="text-black/50">
+          {paymentMethod === "gotovina" ? "Gotovina" : "Kartica"}
+        </p>
+      )}
       <div className="grid grid-cols-2 items-center gap-8 justify-self-center">
         <button
           className="w-35 cursor-pointer rounded-lg border-2 border-black py-3 text-center font-semibold transition-colors duration-300 disabled:cursor-not-allowed disabled:border-0 disabled:bg-gray-400"
