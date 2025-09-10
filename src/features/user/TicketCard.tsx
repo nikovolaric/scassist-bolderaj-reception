@@ -51,7 +51,7 @@ function TicketCard({
 
   return (
     <div
-      className="border-gray/80 bg-neutral relative flex cursor-pointer flex-col rounded-xl border p-4"
+      className="border-gray/80 bg-neutral relative z-50 flex cursor-pointer flex-col rounded-xl border p-4"
       onClick={() => setIsOpen((isOpen) => !isOpen)}
     >
       <div className="flex items-center justify-between">

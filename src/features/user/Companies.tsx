@@ -13,7 +13,7 @@ function Companies() {
   });
 
   return (
-    <div className="col-span-2 flex h-full flex-col gap-1.5">
+    <div className="relative -z-10 col-span-2 flex h-full flex-col gap-1.5">
       <p className="text-sm font-medium text-black/75">Podjetje</p>
       <div className="drop-shadow-input flex h-full flex-col justify-center gap-5 rounded-xl bg-white px-5.5 py-4">
         {isPending ? (
