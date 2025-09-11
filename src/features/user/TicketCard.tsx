@@ -51,7 +51,7 @@ function TicketCard({
 
   return (
     <div
-      className="border-gray/80 bg-neutral relative z-50 flex cursor-pointer flex-col rounded-xl border p-4"
+      className="border-gray/80 bg-neutral flex cursor-pointer flex-col rounded-xl border p-4"
       onClick={() => setIsOpen((isOpen) => !isOpen)}
     >
       <div className="flex items-center justify-between">
@@ -146,7 +146,7 @@ function ConfirmUseTicket({
   }
 
   return (
-    <div className="bg-neutral/95 border-gray/80 absolute top-0 left-0 z-50 flex w-full flex-col gap-15 rounded-xl border px-6 pt-16 pb-5.5">
+    <div className="bg-neutral/95 border-gray/80 absolute top-0 left-0 z-[60] flex w-full flex-col gap-15 rounded-xl border px-6 pt-16 pb-5.5">
       <p className="font-medium">
         Ali ste prepričani, da želite prijaviti obisk na <br />{" "}
         <span className="font-bold">{name}</span>
