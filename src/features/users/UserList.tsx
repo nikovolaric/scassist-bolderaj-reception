@@ -41,6 +41,8 @@ function UserList() {
                   fullName: string;
                   birthDate: string;
                   email: string;
+                  confirmMailToken: string;
+                  unusedTickets: string[];
                 },
                 i: number,
               ) => (

@@ -24,7 +24,7 @@ function TicketCard({
 }) {
   const { id } = useParams();
   const queryClient = useQueryClient();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(true);
   const [isOpenConfirm, setIsOpenConfirm] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const { name, validUntil, visits, visitsLeft, duration, type, used, _id } =
@@ -51,7 +51,7 @@ function TicketCard({
 
   return (
     <div
-      className="border-gray/80 bg-neutral flex cursor-pointer flex-col rounded-xl border p-4"
+      className="border-gray/80 bg-neutral relative z-10 flex cursor-pointer flex-col rounded-xl border p-4"
       onClick={() => setIsOpen((isOpen) => !isOpen)}
     >
       <div className="flex items-center justify-between">

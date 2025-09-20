@@ -14,7 +14,7 @@ function Tickets() {
   return (
     <div className="flex h-full flex-col gap-1.5">
       <p className="text-sm font-medium text-black/75">Vstopnice</p>
-      <div className="drop-shadow-input flex h-full flex-col gap-2 rounded-xl bg-white px-5.5 py-4">
+      <div className="drop-shadow-input relative z-10 flex h-full flex-col gap-2 rounded-xl bg-white px-5.5 py-4">
         {isPending ? (
           <Spinner />
         ) : (

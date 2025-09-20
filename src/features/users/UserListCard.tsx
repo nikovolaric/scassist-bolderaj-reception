@@ -5,7 +5,14 @@ function UserListCard({
   user,
   i,
 }: {
-  user: { fullName: string; birthDate: string; email: string; _id: string };
+  user: {
+    fullName: string;
+    birthDate: string;
+    email: string;
+    _id: string;
+    confirmMailToken: string;
+    unusedTickets: string[];
+  };
   i: number;
 }) {
   return (
@@ -25,8 +32,19 @@ function UserListCard({
             })}
           </p>
         </div>
+        {user.unusedTickets.length > 0 && (
+          <div className="bg-primary h-2 w-2 rounded-full" />
+        )}
       </div>
-      <p className="text-black/50">{user.email}</p>
+      <div className="flex items-center gap-2">
+        <p className="text-black/50">{user.email}</p>
+        {user.email && !user.confirmMailToken && (
+          <div className="h-2 w-2 rounded-full bg-green-600"></div>
+        )}
+        {user.email && user.confirmMailToken && (
+          <div className="h-2 w-2 rounded-full bg-red-600"></div>
+        )}
+      </div>
     </Link>
   );
 }
