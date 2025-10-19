@@ -34,7 +34,20 @@ function ClassListCard({
       </p>
       <p className="text-black/75">{`${hours[0]} - ${hours[1]}`}</p>
       <p className="font-semibold">{className.sl}</p>
-      <p className="font-semibold text-black/75">{teacher.fullName}</p>
+      <div>
+        {!Array.isArray(teacher) ? (
+          <p className="font-semibold text-black/75">{teacher.fullName}</p>
+        ) : (
+          <div className="flex items-center gap-1">
+            {teacher.map((el, i) => (
+              <p className="font-semibold text-black/75" key={el.fullName}>
+                {i !== 0 ? " | " : ""}
+                {el.fullName}
+              </p>
+            ))}
+          </div>
+        )}
+      </div>
       <LinkBtn type="primary" to={`/dashboard/classes/${_id}`}>
         Označi prisotnost
       </LinkBtn>

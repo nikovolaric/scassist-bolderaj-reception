@@ -67,7 +67,20 @@ function ClassInfo({
       <div className="flex flex-col gap-1">
         <p className="text-sm font-medium text-black/75">Izvajalec</p>
         <div className="drop-shadow-input flex items-center justify-center rounded-lg bg-white py-5 text-black/75">
-          <p className="font-semibold">{teacher.fullName}</p>
+          <div>
+            {!Array.isArray(teacher) ? (
+              <p className="font-semibold">{teacher.fullName}</p>
+            ) : (
+              <div className="flex items-center gap-1">
+                {teacher.map((el, i) => (
+                  <p className="font-semibold" key={el.fullName}>
+                    {i !== 0 ? " | " : ""}
+                    {el.fullName}
+                  </p>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
