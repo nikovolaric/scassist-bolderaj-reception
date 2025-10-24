@@ -30,11 +30,14 @@ function TicketCard({
   const { name, validUntil, visits, visitsLeft, duration, type, used, _id } =
     ticket;
 
-  const startDate = new Date();
-  const endDate = new Date(validUntil);
+  const startDate = new Date(new Date().setHours(0, 0, 0));
+  const endDate = new Date(new Date(validUntil).setHours(0, 0, 0));
 
   const diffInMs = endDate.getTime() - startDate.getTime();
-  const diffInDays = Math.floor(diffInMs / (1000 * 60 * 60 * 24));
+  const diffInDays =
+    Math.floor(diffInMs / (1000 * 60 * 60 * 24)) === -1
+      ? 0
+      : Math.floor(diffInMs / (1000 * 60 * 60 * 24));
 
   useEffect(
     function () {
